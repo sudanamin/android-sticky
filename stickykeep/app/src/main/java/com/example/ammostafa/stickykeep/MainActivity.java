@@ -16,10 +16,13 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -102,6 +105,39 @@ public class MainActivity extends AppCompatActivity {
                                     .build(),
                             RC_SIGN_IN);
                 }
+            }
+        };
+
+        Query query = restRef.collection("friends");
+
+        FirestoreRecyclerOptions<FriendsResponse> response = new FirestoreRecyclerOptions.Builder<FriendsResponse>()
+                .setQuery(query, FriendsResponse.class)
+                .build();
+
+        FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<FriendsResponse, FriendsHolder>(response) {
+            @Override
+            public void onBindViewHolder(FriendsHolder holder, int position, FriendsResponse model) {
+                progressBar.setVisibility(View.GONE);
+                holder.textName.setText(model.getName());
+                holder.textTitle.setText(model.getTitle());
+                holder.textCompany.setText(model.getCompany());
+                Glide.with(getApplicationContext())
+                        .load(model.getImage())
+                        .into(holder.imageView);
+                holder.itemView.setOnClickListener(v -> {
+                    Snackbar.make(friendList, model.getName()+", "+model.getTitle()+" at "+model.getCompany(), Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                });
+            }
+            @Override
+            public FriendsHolder onCreateViewHolder(ViewGroup group, int i) {
+                View view = LayoutInflater.from(group.getContext())
+                        .inflate(R.layout.list_item, group, false);
+                return new FriendsHolder(view);
+            }
+            @Override
+            public void onError(FirebaseFirestoreException e) {
+                Log.e("error", e.getMessage());
             }
         };
     }
