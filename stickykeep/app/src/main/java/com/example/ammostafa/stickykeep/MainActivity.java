@@ -6,13 +6,16 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.InputFilter;
-import android.text.TextWatcher;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -22,16 +25,26 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+
+import java.util.Arrays;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseFirestore mFirestore;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     public static final int RC_SIGN_IN = 1;
     public static final String ANONYMOUS = "anonymous";
+    private String mUsername;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         mFirestore = FirebaseFirestore.getInstance();
         DocumentReference restRef = mFirestore.collection("restaurants").document();
 
-        mMessageEditText.addTextChangedListener(new TextWatcher() {
+    /*    mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
             }
@@ -82,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 // Clear input box
                 mMessageEditText.setText("");
             }
-        });
+        });*/
 
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
@@ -99,9 +112,10 @@ public class MainActivity extends AppCompatActivity {
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setIsSmartLockEnabled(false)
-                                    .setProviders(
-                                            AuthUI.EMAIL_PROVIDER,
-                                            AuthUI.GOOGLE_PROVIDER)
+                                    .setAvailableProviders(Arrays.asList(
+                                            new AuthUI.IdpConfig.EmailBuilder().build(),
+                                            new AuthUI.IdpConfig.GoogleBuilder().build(),
+                                            new AuthUI.IdpConfig.FacebookBuilder().build()))
                                     .build(),
                             RC_SIGN_IN);
                 }
@@ -110,24 +124,24 @@ public class MainActivity extends AppCompatActivity {
 
         Query query = restRef.collection("friends");
 
-        FirestoreRecyclerOptions<FriendsResponse> response = new FirestoreRecyclerOptions.Builder<FriendsResponse>()
-                .setQuery(query, FriendsResponse.class)
+        FirestoreRecyclerOptions<StickyClass> response = new FirestoreRecyclerOptions.Builder<StickyClass>()
+                .setQuery(query, StickyClass.class)
                 .build();
 
-        FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<FriendsResponse, FriendsHolder>(response) {
+        FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<StickyClass, FriendsHolder>(response) {
             @Override
-            public void onBindViewHolder(FriendsHolder holder, int position, FriendsResponse model) {
+            public void onBindViewHolder(FriendsHolder holder, int position, StickyClass model) {
                 progressBar.setVisibility(View.GONE);
                 holder.textName.setText(model.getName());
                 holder.textTitle.setText(model.getTitle());
                 holder.textCompany.setText(model.getCompany());
-                Glide.with(getApplicationContext())
+               /* Glide.with(getApplicationContext())
                         .load(model.getImage())
                         .into(holder.imageView);
                 holder.itemView.setOnClickListener(v -> {
                     Snackbar.make(friendList, model.getName()+", "+model.getTitle()+" at "+model.getCompany(), Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
-                });
+                });*/
             }
             @Override
             public FriendsHolder onCreateViewHolder(ViewGroup group, int i) {
@@ -140,6 +154,22 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("error", e.getMessage());
             }
         };
+    }
+
+    public class FriendsHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.name)
+        TextView textName;
+      //  @BindView(R.id.image)
+       // CircleImageView imageView;
+        @BindView(R.id.title)
+        TextView textTitle;
+      //  @BindView(R.id.company)
+      //  TextView textCompany;
+
+        public FriendsHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
     }
 
     @Override
@@ -172,22 +202,22 @@ public class MainActivity extends AppCompatActivity {
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
-        mMessageAdapter.clear();
-        detachDatabaseReadListener();
+    //    mMessageAdapter.clear();
+     //   detachDatabaseReadListener();
     }
 
     private void onSignedInInitialize(String username) {
         mUsername = username;
-        attachDatabaseReadListener();
+      //  attachDatabaseReadListener();
     }
 
     private void onSignedOutCleanup() {
         mUsername = ANONYMOUS;
-        mMessageAdapter.clear();
-        detachDatabaseReadListener();
+      //  mMessageAdapter.clear();
+     //   detachDatabaseReadListener();
     }
 
-    private void attachDatabaseReadListener() {
+  /*  private void attachDatabaseReadListener() {
         if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
                 @Override
@@ -203,14 +233,14 @@ public class MainActivity extends AppCompatActivity {
             };
             mMessagesDatabaseReference.addChildEventListener(mChildEventListener);
         }
-    }
+    }*/
 
-    private void detachDatabaseReadListener() {
+  /*  private void detachDatabaseReadListener() {
         if (mChildEventListener != null) {
             mMessagesDatabaseReference.removeEventListener(mChildEventListener);
             mChildEventListener = null;
         }
-    }
+    }*/
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
