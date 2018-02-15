@@ -6,7 +6,6 @@ apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.0"
     defaultConfig {
         applicationId "com.example.aminov.aaa"
         minSdkVersion 15
@@ -39,4 +38,14 @@ dependencies {
 
     // CardView
     compile 'com.android.support:cardview-v7:26.0.+'
+}
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        def requested = details.requested
+        if (requested.group == 'com.android.support') {
+            if (!requested.name.startsWith("multidex")) {
+                details.useVersion '26.0.0'
+            }
+        }
+    }
 }

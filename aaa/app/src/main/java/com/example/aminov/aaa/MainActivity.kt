@@ -51,10 +51,10 @@ var listOfStickys = ArrayList<Sticky>()
             var stickView = inflator.inflate(R.layout.sticky_ticket,null)
             stickView.title_textview.setText(sticky.title!!)
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                stickView.data_textview.setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>"))
+                stickView.data_textview.setText(Html.fromHtml("<h2>Data</h2><br><p>Description here</p>"))
             }
             else {
-                stickView.title_textview.setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>", Html.FROM_HTML_MODE_COMPACT))
+             //   stickView.data_textview.setText(Html.fromHtml("<h2>Title</h2><br><p>Description here</p>", Html.FROM_HTML_MODE_COMPACT))
 
             }
 
