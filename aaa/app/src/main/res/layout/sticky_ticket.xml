@@ -1,12 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_marginTop="80dp"
     android:layout_marginBottom="40dp">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dip" >
+    <LinearLayout android:id="@+id/thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dip"
+        android:layout_alignParentRight="true"
 
+        android:layout_marginRight="5dip">
+
+        <ImageView
+            android:id="@+id/list_image"
+            android:layout_width="25dip"
+            android:layout_height="25dip"
+            app:srcCompat="@drawable/close" />
+
+    </LinearLayout>
 
 
         <EditText
@@ -16,8 +36,8 @@
             android:background="@android:color/transparent"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Title" />
-
+            android:text="@string/title" />
+    </RelativeLayout>
         <EditText
             android:id="@+id/data_textview"
             android:layout_width="match_parent"
@@ -38,6 +58,10 @@
             android:background="@android:color/transparent"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Label" />
+            android:text="@string/label" />
 
-    </LinearLayout>
+
+
+
+
+</LinearLayout>
