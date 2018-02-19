@@ -1,7 +1,5 @@
 package com.example.ammostafa.stickykeep;
 
-import com.google.firebase.firestore.IgnoreExtraProperties;
-
 /**
  * Created by Aminov on 2/9/2018.
  */
@@ -9,9 +7,8 @@ import com.google.firebase.firestore.IgnoreExtraProperties;
 
 
 
-    @IgnoreExtraProperties
     public class StickyClass {
-        private String name;
+        private String sdata;
         private String title;
         private String company;
         private String image;
@@ -19,19 +16,19 @@ import com.google.firebase.firestore.IgnoreExtraProperties;
         public StickyClass() {
         }
 
-        public StickyClass(String name, String title, String company, String image) {
-            this.name = name;
+        public StickyClass(String data, String title, String company, String image) {
+            this.sdata = data;
             this.title = title;
             this.company = company;
             this.image = image;
         }
 
-        public String getName() {
-            return name;
+        public String getData() {
+            return sdata;
         }
 
-        public void setName(String name) {
-            this.name = name;
+        public void setData(String data) {
+            this.sdata = data;
         }
 
         public String getTitle() {
@@ -58,4 +55,3 @@ import com.google.firebase.firestore.IgnoreExtraProperties;
             this.image = image;
         }
     }
-}

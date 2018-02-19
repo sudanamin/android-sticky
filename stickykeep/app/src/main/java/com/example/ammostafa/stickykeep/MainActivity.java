@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -36,22 +37,36 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseFirestore mFirestore;
-    @BindView(R.id.progress_bar)
-    ProgressBar progressBar;
+    //@BindView(R.id.progress_bar)
+    //ProgressBar progressBar;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     public static final int RC_SIGN_IN = 1;
     public static final String ANONYMOUS = "anonymous";
     private String mUsername;
+    FirebaseUser user;
 
+
+    RecyclerView stickyList;
+
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
+
+    private FirestoreRecyclerAdapter adapter;
+    LinearLayoutManager linearLayoutManager;
+    private void init(){
+      //  linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+      //  stickyList.setLayoutManager(linearLayoutManager);
+      //  db = FirebaseFirestore.getInstance();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        stickyList = findViewById(R.id.sticky_list);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,8 +77,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Firestore
+        mFirebaseAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
-        DocumentReference restRef = mFirestore.collection("restaurants").document();
 
     /*    mMessageEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -101,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
+                 user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
                     onSignedInInitialize(user.getDisplayName());
@@ -122,54 +137,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        Query query = restRef.collection("friends");
 
-        FirestoreRecyclerOptions<StickyClass> response = new FirestoreRecyclerOptions.Builder<StickyClass>()
-                .setQuery(query, StickyClass.class)
-                .build();
-
-        FirestoreRecyclerAdapter adapter = new FirestoreRecyclerAdapter<StickyClass, FriendsHolder>(response) {
-            @Override
-            public void onBindViewHolder(FriendsHolder holder, int position, StickyClass model) {
-                progressBar.setVisibility(View.GONE);
-                holder.textName.setText(model.getName());
-                holder.textTitle.setText(model.getTitle());
-                holder.textCompany.setText(model.getCompany());
-               /* Glide.with(getApplicationContext())
-                        .load(model.getImage())
-                        .into(holder.imageView);
-                holder.itemView.setOnClickListener(v -> {
-                    Snackbar.make(friendList, model.getName()+", "+model.getTitle()+" at "+model.getCompany(), Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-                });*/
-            }
-            @Override
-            public FriendsHolder onCreateViewHolder(ViewGroup group, int i) {
-                View view = LayoutInflater.from(group.getContext())
-                        .inflate(R.layout.list_item, group, false);
-                return new FriendsHolder(view);
-            }
-            @Override
-            public void onError(FirebaseFirestoreException e) {
-                Log.e("error", e.getMessage());
-            }
-        };
-    }
-
-    public class FriendsHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.name)
-        TextView textName;
-      //  @BindView(R.id.image)
-       // CircleImageView imageView;
-        @BindView(R.id.title)
-        TextView textTitle;
-      //  @BindView(R.id.company)
-      //  TextView textCompany;
-
-        public FriendsHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
     }
 
     @Override
@@ -208,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void onSignedInInitialize(String username) {
         mUsername = username;
-      //  attachDatabaseReadListener();
+        attachDatabaseReadListener();
     }
 
     private void onSignedOutCleanup() {
@@ -217,7 +185,66 @@ public class MainActivity extends AppCompatActivity {
      //   detachDatabaseReadListener();
     }
 
-  /*  private void attachDatabaseReadListener() {
+   private void attachDatabaseReadListener() {
+
+
+       DocumentReference  usersRef = mFirestore.collection("users").document(user.getUid());
+
+       Query query;
+       query = usersRef.collection("userData");
+
+       FirestoreRecyclerOptions<StickyClass> response = new FirestoreRecyclerOptions.Builder<StickyClass>()
+               .setQuery(query, StickyClass.class)
+               .build();
+
+       adapter = new FirestoreRecyclerAdapter<StickyClass, FriendsHolder>(response) {
+           @Override
+           public void onBindViewHolder(FriendsHolder holder, int position, StickyClass model) {
+               progressBar.setVisibility(View.GONE);
+               holder.dataView.setText(model.getData());
+               // holder.textTitle.setText(model.getTitle());
+               // holder.textCompany.setText(model.getCompany());
+               /* Glide.with(getApplicationContext())
+                        .load(model.getImage())
+                        .into(holder.imageView);
+                holder.itemView.setOnClickListener(v -> {
+                    Snackbar.make(friendList, model.getName()+", "+model.getTitle()+" at "+model.getCompany(), Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                });*/
+           }
+           @Override
+           public FriendsHolder onCreateViewHolder(ViewGroup group, int i) {
+               View view = LayoutInflater.from(group.getContext())
+                       .inflate(R.layout.sticky_ticket, group, false);
+               return new FriendsHolder(view);
+           }
+           @Override
+           public void onError(FirebaseFirestoreException e) {
+               Log.e("error", e.getMessage());
+           }
+       };
+
+       adapter.notifyDataSetChanged();
+       linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+       stickyList.setLayoutManager(linearLayoutManager);
+       stickyList.setAdapter(adapter);
+   }
+
+    public class FriendsHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.data_textview)
+        TextView dataView;
+        //  @BindView(R.id.image)
+        // CircleImageView imageView;
+        @BindView(R.id.title)
+        TextView textTitle;
+        //  @BindView(R.id.company)
+        //  TextView textCompany;
+
+        public FriendsHolder(View itemView) {
+            super(itemView);
+            ButterKnife.bind(this, itemView);
+        }
+  /*
         if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
                 @Override
@@ -232,8 +259,8 @@ public class MainActivity extends AppCompatActivity {
                 public void onCancelled(DatabaseError databaseError) {}
             };
             mMessagesDatabaseReference.addChildEventListener(mChildEventListener);
-        }
-    }*/
+        }*/
+    }
 
   /*  private void detachDatabaseReadListener() {
         if (mChildEventListener != null) {
@@ -255,5 +282,10 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    public void deleteSticky(View view)
+    {
+        Toast.makeText(this, "delete complete", Toast.LENGTH_SHORT).show();
     }
 }

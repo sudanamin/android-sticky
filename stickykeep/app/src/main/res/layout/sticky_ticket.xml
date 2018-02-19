@@ -18,13 +18,12 @@
         android:padding="3dip"
         android:layout_alignParentRight="true"
 
-        android:layout_marginRight="5dip" android:layout_alignParentEnd="true" android:layout_marginEnd="5dip">
+        android:layout_marginRight="5dip">
 
         <ImageView
-            android:id="@+id/list_image"
+            android:id="@+id/sticky_close"
             android:layout_width="25dip"
             android:layout_height="25dip"
-            android:contentDescription="@string/todo"
             app:srcCompat="@drawable/close"
             tools:onClick="deleteSticky" />
 
@@ -37,7 +36,7 @@
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
             android:ems="10"
-            android:text="@string/title" android:inputType="" />
+            android:text="@string/title" />
     </RelativeLayout>
         <EditText
             android:id="@+id/data_textview"

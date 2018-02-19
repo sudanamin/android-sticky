@@ -5,14 +5,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        tools:onClick="onnn" />
     <ListView
         android:id="@+id/sticky_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="10pt"
         android:paddingLeft="2pt"
-        android:paddingRight="2pt" />
+        android:paddingRight="2pt"
      android:divider="@android:color/transparent"
-     android:dividerHeight="20dp"/>
+     android:dividerHeight="20dp">
 
+
+
+    </ListView>
 </LinearLayout>
