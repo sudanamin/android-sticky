@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     RecyclerView stickyList;
 
-    @BindView(R.id.progress_bar)
+    //@BindView(R.id.progress_bar)
     ProgressBar progressBar;
 
     private FirestoreRecyclerAdapter adapter;
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        progressBar = findViewById(R.id.progress_bar);
         setSupportActionBar(toolbar);
         stickyList = findViewById(R.id.sticky_list);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -160,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume(){
+
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
@@ -167,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
@@ -174,6 +177,19 @@ public class MainActivity extends AppCompatActivity {
      //   detachDatabaseReadListener();
     }
 
+    @Override
+    protected void onStart(){
+        super.onStart();
+
+
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+        adapter.stopListening();
+
+    }
     private void onSignedInInitialize(String username) {
         mUsername = username;
         attachDatabaseReadListener();
@@ -189,9 +205,29 @@ public class MainActivity extends AppCompatActivity {
 
 
        DocumentReference  usersRef = mFirestore.collection("users").document(user.getUid());
+     //  System.out.println("user is aaaaaaaaaaaaaaaaaaaaaaaaaaa "+user.getUid());
+       //CollectionReference query;
+       Query query = usersRef.collection("userData");
+       //Query query = FirebaseFirestore.getInstance().collection("users/"+user.getUid()+"/userData");
+    //   System.out.println("hhhhhhhhhhhh"+"hhhhhhhhhh");
 
-       Query query;
-       query = usersRef.collection("userData");
+            /*   query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+
+                                             @Override
+                                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                 if (task.isSuccessful()) {
+                                                     for (DocumentSnapshot document : task.getResult()) {
+                                                         StickyClass sc = document.toObject(StickyClass.class);
+                                                        // StickyClass sc = new Gson().fromJson(document.getData().toString(), StickyClass.class);
+                                                        // sc.getData();
+                                                         System.out.println("sc get data ddddd "+ sc.getdata() + " => " + document.getData());
+                                                     }
+                                                 } else {
+                                                     System.out.println("could errorrrrrr"+ "Error getting documents: "+ task.getException());
+                                                 }
+                                             }
+                                         });*/
+
 
        FirestoreRecyclerOptions<StickyClass> response = new FirestoreRecyclerOptions.Builder<StickyClass>()
                .setQuery(query, StickyClass.class)
@@ -201,7 +237,9 @@ public class MainActivity extends AppCompatActivity {
            @Override
            public void onBindViewHolder(FriendsHolder holder, int position, StickyClass model) {
                progressBar.setVisibility(View.GONE);
-               holder.dataView.setText(model.getData());
+               holder.dataView.setText(model.getScolor());
+
+               System.out.println("from mode.getdata aaaaaaaaaaaaaaaaaaaaaaaaaaa"+model.getScolor());
                // holder.textTitle.setText(model.getTitle());
                // holder.textCompany.setText(model.getCompany());
                /* Glide.with(getApplicationContext())
@@ -211,7 +249,7 @@ public class MainActivity extends AppCompatActivity {
                     Snackbar.make(friendList, model.getName()+", "+model.getTitle()+" at "+model.getCompany(), Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                 });*/
-           }
+          }
            @Override
            public FriendsHolder onCreateViewHolder(ViewGroup group, int i) {
                View view = LayoutInflater.from(group.getContext())
@@ -223,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
                Log.e("error", e.getMessage());
            }
        };
-
+       adapter.startListening();
        adapter.notifyDataSetChanged();
        linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
        stickyList.setLayoutManager(linearLayoutManager);
@@ -235,8 +273,8 @@ public class MainActivity extends AppCompatActivity {
         TextView dataView;
         //  @BindView(R.id.image)
         // CircleImageView imageView;
-        @BindView(R.id.title)
-        TextView textTitle;
+     //   @BindView(R.id.title)
+    //    TextView textTitle;
         //  @BindView(R.id.company)
         //  TextView textCompany;
 

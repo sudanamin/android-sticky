@@ -8,41 +8,35 @@ package com.example.ammostafa.stickykeep;
 
 
     public class StickyClass {
-        private String sdata;
-        private String title;
-        private String company;
-        private String image;
+        private String Scolor;
+
+        private int  top;
+        private int left;
+    private String sdata ;
 
         public StickyClass() {
         }
 
-        public StickyClass(String data, String title, String company, String image) {
-            this.sdata = data;
-            this.title = title;
-            this.company = company;
-            this.image = image;
-        }
+      /*  public StickyClass(String sdata, String Scolor, int  top, int left) {
+            this.sdata = sdata;
+            this.Scolor = Scolor;
+            this.top = top;
+            this.left = left;
+        }*/
 
-        public String getData() {
+        public String getdata() {
             return sdata;
         }
 
-        public void setData(String data) {
-            this.sdata = data;
+          public int getTop() {
+            return this.top;
         }
 
-        public String getTitle() {
-            return title;
-        }
 
-        public void setTitle(String title) {
-            this.title = title;
+        public String getScolor() {
+            return Scolor;
         }
-
-        public String getCompany() {
-            return company;
-        }
-
+/*
         public void setCompany(String company) {
             this.company = company;
         }
@@ -53,5 +47,5 @@ package com.example.ammostafa.stickykeep;
 
         public void setImage(String image) {
             this.image = image;
-        }
+        }*/
     }
