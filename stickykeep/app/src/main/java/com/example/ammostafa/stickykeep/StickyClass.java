@@ -24,7 +24,7 @@ package com.example.ammostafa.stickykeep;
             this.left = left;
         }*/
 
-        public String getdata() {
+        public String getsdata() {
             return sdata;
         }
 

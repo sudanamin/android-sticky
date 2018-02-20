@@ -237,9 +237,9 @@ public class MainActivity extends AppCompatActivity {
            @Override
            public void onBindViewHolder(FriendsHolder holder, int position, StickyClass model) {
                progressBar.setVisibility(View.GONE);
-               holder.dataView.setText(model.getScolor());
+               holder.dataView.setText(model.getsdata());
 
-               System.out.println("from mode.getdata aaaaaaaaaaaaaaaaaaaaaaaaaaa"+model.getScolor());
+               System.out.println("modelllll.getsdata tttttttttttt"+model.getsdata());
                // holder.textTitle.setText(model.getTitle());
                // holder.textCompany.setText(model.getCompany());
                /* Glide.with(getApplicationContext())
