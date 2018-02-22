@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -35,9 +34,6 @@ import com.google.firebase.firestore.Query;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -85,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                     newSticky.put("top",10);
                     newSticky.put("left",15);
                     newSticky.put("Scolor","ffffff");
-           
+
 
 
                 CollectionReference userData = mFirestore.collection("users").document(user.getUid()).collection("userData");
@@ -264,13 +260,35 @@ public class MainActivity extends AppCompatActivity {
                .setQuery(query, StickyClass.class)
                .build();
 
-       adapter = new FirestoreRecyclerAdapter<StickyClass, FriendsHolder>(response) {
+       adapter = new FirestoreRecyclerAdapter<StickyClass, FireHolder>(response) {
+
+
+
            @Override
-           public void onBindViewHolder(FriendsHolder holder, int position, StickyClass model) {
+           public void onBindViewHolder(FireHolder holder, int position, StickyClass model) {
                progressBar.setVisibility(View.GONE);
                holder.dataView.setText(model.getsdata());
+               String docId = getSnapshots().getSnapshot(position).getId();
 
-               System.out.println("modelllll.getsdata tttttttttttt"+model.getsdata());
+               Log.d("GETREFTEST", docId);
+               System.out.println("modelllll. postion id "+position);
+           //    holder.stickyClose.setOnClickListener((new View.OnClickListener() {
+
+            //       public void onClick(View v) {
+                       //v.getId() will give you the image id
+                    /*   String.valueOf(getAdapterPosition())
+                       String docId = getSnapshots().getSnapshot(position).getId();
+                       deleteSticky( docId);*/
+           //          System.out.println("modelllll.view id"+v.getId());
+           //          Toast.makeText(v.getContext(), "Sign in mmmmmm", Toast.LENGTH_SHORT).show();
+
+
+           //      }
+          //     }));
+             //  String docId = getSnapshots().getSnapshot(position).getId();
+
+               Log.d("GETREFTEST", docId);
+               System.out.println("modelllll.getididididididididid"+docId);
                // holder.textTitle.setText(model.getTitle());
                // holder.textCompany.setText(model.getCompany());
                /* Glide.with(getApplicationContext())
@@ -282,10 +300,26 @@ public class MainActivity extends AppCompatActivity {
                 });*/
           }
            @Override
-           public FriendsHolder onCreateViewHolder(ViewGroup group, int i) {
+           public FireHolder onCreateViewHolder(ViewGroup group, int i) {
                View view = LayoutInflater.from(group.getContext())
                        .inflate(R.layout.sticky_ticket, group, false);
-               return new FriendsHolder(view);
+
+               FireHolder viewHolder = new FireHolder(view);
+
+               viewHolder.setOnClickListener(new FireHolder.ClickListener() {
+                   @Override
+                   public void onItemClick(View view, int position) {
+                       String docId = getSnapshots().getSnapshot(position).getId();
+
+                       Toast.makeText(view.getContext(), "Item clicked at my doc id by amin is  " + docId, Toast.LENGTH_SHORT).show();
+                   }
+
+                   @Override
+                   public void onItemLongClick(View view, int position) {
+                       Toast.makeText(view.getContext(), "Item long clicked at " + position, Toast.LENGTH_SHORT).show();
+                   }
+               });
+               return  viewHolder;
            }
            @Override
            public void onError(FirebaseFirestoreException e) {
@@ -299,20 +333,7 @@ public class MainActivity extends AppCompatActivity {
        stickyList.setAdapter(adapter);
    }
 
-    public class FriendsHolder extends RecyclerView.ViewHolder {
-        @BindView(R.id.data_textview)
-        TextView dataView;
-        //  @BindView(R.id.image)
-        // CircleImageView imageView;
-     //   @BindView(R.id.title)
-    //    TextView textTitle;
-        //  @BindView(R.id.company)
-        //  TextView textCompany;
 
-        public FriendsHolder(View itemView) {
-            super(itemView);
-            ButterKnife.bind(this, itemView);
-        }
   /*
         if (mChildEventListener == null) {
             mChildEventListener = new ChildEventListener() {
@@ -329,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
             };
             mMessagesDatabaseReference.addChildEventListener(mChildEventListener);
         }*/
-    }
+
 
   /*  private void detachDatabaseReadListener() {
         if (mChildEventListener != null) {
@@ -353,8 +374,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void deleteSticky(View view)
+    public void deleteSticky(View v )
     {
-        Toast.makeText(this, "delete complete", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "delete complete for doc id : ", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(v.getContext(), "Sign in canceled", Toast.LENGTH_SHORT).show();
+  /*      db.collection("cities").document("DC")
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error deleting document", e);
+                    }
+                });
+*/
     }
 }
