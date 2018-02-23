@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.common.ChangeEventType;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -27,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -48,8 +52,11 @@ public class MainActivity extends AppCompatActivity {
     private String mUsername;
     FirebaseUser user;
 
-
+   boolean typing =false;
     RecyclerView stickyList;
+
+     public static Long lastTypingTime = Long.valueOf(0);
+
 
     //@BindView(R.id.progress_bar)
     ProgressBar progressBar;
@@ -262,12 +269,42 @@ public class MainActivity extends AppCompatActivity {
 
        adapter = new FirestoreRecyclerAdapter<StickyClass, FireHolder>(response) {
 
-
+           @Override
+           public void onChildChanged(@NonNull ChangeEventType type,
+                                      @NonNull DocumentSnapshot snapshot,
+                                      int newIndex,
+                                      int oldIndex) {
+               switch (type) {
+                   case ADDED:
+                       notifyItemInserted(newIndex);
+                       break;
+                   case CHANGED:
+                     //  notifyItemChanged(newIndex);
+                       break;
+                   case REMOVED:
+                       notifyItemRemoved(oldIndex);
+                       break;
+                   case MOVED:
+                       notifyItemMoved(oldIndex, newIndex);
+                       break;
+                   default:
+                       throw new IllegalStateException("Incomplete case statement");
+               }
+           }
 
            @Override
            public void onBindViewHolder(FireHolder holder, int position, StickyClass model) {
                progressBar.setVisibility(View.GONE);
-               holder.dataView.setText(model.getsdata());
+               String ss = model.getsdata();
+           //   if(holder.dataView.getText().toString().length() == 0) {
+                   if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                       holder.dataView.setText(Html.fromHtml(ss, Html.FROM_HTML_MODE_LEGACY));
+                   } else {
+                       holder.dataView.setText(Html.fromHtml(ss));
+                   }
+           //    }
+     //    holder.dataView.setSelection(null);
+
                String docId = getSnapshots().getSnapshot(position).getId();
 
                Log.d("GETREFTEST", docId);
@@ -307,11 +344,14 @@ public class MainActivity extends AppCompatActivity {
                FireHolder viewHolder = new FireHolder(view);
 
                viewHolder.setOnClickListener(new FireHolder.ClickListener() {
+
                    @Override
                    public void onItemClick(View view, int position) {
                        String docId = getSnapshots().getSnapshot(position).getId();
+                       DocumentReference  docRef = mFirestore.collection("users").document(user.getUid()).collection("userData").document(docId);
+                       Util.deleteSticky(view.getContext(),docRef);
 
-                       Toast.makeText(view.getContext(), "Item clicked at my doc id by amin is  " + docId, Toast.LENGTH_SHORT).show();
+                       Toast.makeText(view.getContext(), "Item was deleted  " + docId, Toast.LENGTH_SHORT).show();
                    }
 
                    @Override
@@ -319,6 +359,50 @@ public class MainActivity extends AppCompatActivity {
                        Toast.makeText(view.getContext(), "Item long clicked at " + position, Toast.LENGTH_SHORT).show();
                    }
                });
+
+               viewHolder.setOnTextChangeListener(new FireHolder.TextChangeListener() {
+                                                      @Override
+                                                      public void onTextChanged(CharSequence BDBDBD, int position) {
+                                                       /*   */
+                                                        //  lastTypingTime = Calendar.getInstance().getTimeInMillis();
+
+                                                      }
+
+                                                      @Override
+                                                      public void afterTextChanged(Editable editable, int position) {
+                                                         String docId = getSnapshots().getSnapshot(position).getId();
+                                                         String stickyData = editable.toString();
+
+
+                                                          DocumentReference docRef = mFirestore.collection("users").document(user.getUid()).collection("userData").document(docId);
+
+                                                      /*    lastTypingTime = Calendar.getInstance().getTimeInMillis();
+
+
+                                                               asynTask updateAsync = new asynTask(docRef, stickyData);
+                                                               updateAsync.execute();*/
+
+
+
+
+
+                                                          docRef.update("sdata", stickyData)
+                                                                  .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                      @Override
+                                                                      public void onSuccess(Void aVoid) {
+                                                                          Log.d("update sdata", "DocumentSnapshot successfully updated!");
+                                                                      }
+                                                                  })
+                                                                  .addOnFailureListener(new OnFailureListener() {
+                                                                      @Override
+                                                                      public void onFailure(@NonNull Exception e) {
+                                                                          Log.w("update sdata", "Error updating document", e);
+                                                                      }
+                                                                  });
+
+                                                      }
+                                                  }
+               );
                return  viewHolder;
            }
            @Override
@@ -374,7 +458,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void deleteSticky(View v )
+  /*  public void deleteSticky(View v )
     {
         Toast.makeText(this, "delete complete for doc id : ", Toast.LENGTH_SHORT).show();
        // Toast.makeText(v.getContext(), "Sign in canceled", Toast.LENGTH_SHORT).show();
@@ -392,6 +476,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.w(TAG, "Error deleting document", e);
                     }
                 });
-*/
-    }
+
+    }*/
 }

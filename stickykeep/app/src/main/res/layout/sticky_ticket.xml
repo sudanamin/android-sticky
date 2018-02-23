@@ -6,39 +6,50 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
 >
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="5dip" >
-    <LinearLayout android:id="@+id/thumbnail"
+
+
+
+    <RelativeLayout  android:id="@+id/thumbnail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="3dip"
-        android:layout_alignParentRight="true"
-
-        android:layout_marginRight="5dip">
+        android:background="#BDBDBD"
+        android:paddingLeft="0dp"
+      >
 
         <ImageView
             android:id="@+id/sticky_close"
-            android:layout_width="25dip"
-            android:layout_height="25dip"
+            android:layout_width="30dip"
+            android:layout_height="30dip"
             app:srcCompat="@drawable/close"
+            android:layout_alignParentRight="true"
+
+            />
+
+        <ImageView
+            android:id="@+id/sticky_add"
+
+            android:layout_width="27dip"
+            android:layout_height="27dip"
+            android:tint="@color/colorPrimary"
+            app:srcCompat="@drawable/ic_add_black_24dp"
 
 
             />
         <!--   tools:onClick="deleteSticky"-->
-    </LinearLayout>
+    </RelativeLayout >
 
 
-        <EditText
-            android:id="@+id/title_textview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:ems="10"
-            android:text="@string/title" />
-    </RelativeLayout>
+
+
+
+    <EditText
+        android:id="@+id/title_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:ems="10"
+        android:paddingLeft="5dp"
+        android:text="@string/title" />
         <EditText
             android:id="@+id/data_textview"
             android:layout_width="match_parent"
@@ -46,14 +57,15 @@
             android:background="@android:color/transparent"
             android:ems="10"
             android:inputType="textMultiLine"
-            tools:text="sdf df df asdf asdf "
+            tools:text=""
             android:minHeight="150dp"
             android:gravity="top"
+            android:paddingLeft="5dp"
             />
 
         <EditText
             android:id="@+id/label_textview"
-
+            android:paddingLeft="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"

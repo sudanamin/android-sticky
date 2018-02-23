@@ -1,9 +1,11 @@
 package com.example.ammostafa.stickykeep;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 /**
  * Created by Aminov on 2/22/2018.
@@ -13,7 +15,7 @@ import android.widget.TextView;
 
     public class FireHolder extends RecyclerView.ViewHolder  {
 
-        TextView dataView;
+        EditText dataView;
 
         ImageView stickyClose;
         //   @BindView(R.id.title)
@@ -40,6 +42,24 @@ import android.widget.TextView;
                 }
             });
 
+
+           dataView.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    mTextChangeListener.onTextChanged(charSequence,getAdapterPosition());
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    mTextChangeListener.afterTextChanged(editable,getAdapterPosition());
+                }
+            });
+           // dataView.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
+
         }
         private FireHolder.ClickListener mClickListener;
 
@@ -52,5 +72,20 @@ import android.widget.TextView;
         public void setOnClickListener(FireHolder.ClickListener clickListener){
             mClickListener = clickListener;
         }
+
+
+        //         text change
+
+    private FireHolder.TextChangeListener mTextChangeListener;
+
+    //Interface to send callbacks...
+    public interface TextChangeListener{
+        public void onTextChanged(CharSequence charSequence, int position);
+        public void afterTextChanged(Editable editable, int position);
+    }
+
+    public void setOnTextChangeListener(FireHolder.TextChangeListener textChangeListener){
+        mTextChangeListener = textChangeListener;
+    }
     }
 
