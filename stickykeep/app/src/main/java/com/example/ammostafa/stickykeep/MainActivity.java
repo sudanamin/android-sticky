@@ -11,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.Html;
+import android.text.SpannableString;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -373,6 +374,9 @@ public class MainActivity extends AppCompatActivity {
                                                          String docId = getSnapshots().getSnapshot(position).getId();
                                                          String stickyData = editable.toString();
 
+                                                        String stickyDataHtml =  Html.toHtml(new SpannableString(stickyData));
+
+
 
                                                           DocumentReference docRef = mFirestore.collection("users").document(user.getUid()).collection("userData").document(docId);
 
@@ -386,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-                                                          docRef.update("sdata", stickyData)
+                                                          docRef.update("sdata", stickyDataHtml)
                                                                   .addOnSuccessListener(new OnSuccessListener<Void>() {
                                                                       @Override
                                                                       public void onSuccess(Void aVoid) {
