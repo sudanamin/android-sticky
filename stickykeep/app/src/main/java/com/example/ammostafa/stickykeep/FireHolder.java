@@ -1,5 +1,6 @@
 package com.example.ammostafa.stickykeep;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,7 +18,7 @@ import android.widget.ImageView;
 
         EditText dataView;
 
-        ImageView stickyClose;
+        ImageView stickyClose,stickyAdd;
         //   @BindView(R.id.title)
         //    TextView textTitle;
         //  @BindView(R.id.company)
@@ -27,17 +28,30 @@ import android.widget.ImageView;
             super(itemView);
             dataView =  itemView.findViewById(R.id.data_textview);
             stickyClose = itemView.findViewById(R.id.sticky_close);
+            stickyAdd =  itemView.findViewById(R.id.sticky_add);
+
             stickyClose.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mClickListener.onItemClick(v, getAdapterPosition());
+                    mClickListener.onItemClick(v, getAdapterPosition(),ClickEventType.DELETE);
 
                 }
             });
+
+            stickyAdd.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mClickListener.onItemClick(v, getAdapterPosition(),ClickEventType.ADD);
+
+                }
+            });
+
+
+
             itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    mClickListener.onItemLongClick(v, getAdapterPosition());
+                  //  mClickListener.onItemLongClick(v, getAdapterPosition());
                     return true;
                 }
             });
@@ -65,8 +79,8 @@ import android.widget.ImageView;
 
         //Interface to send callbacks...
         public interface ClickListener{
-            public void onItemClick(View view, int position);
-            public void onItemLongClick(View view, int position);
+            public void onItemClick(View view, int position,@NonNull ClickEventType type);
+            public void onItemLongClick(View view, int position,@NonNull ClickEventType type);
         }
 
         public void setOnClickListener(FireHolder.ClickListener clickListener){
