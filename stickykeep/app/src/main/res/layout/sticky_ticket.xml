@@ -30,7 +30,7 @@
 
             android:layout_width="27dip"
             android:layout_height="27dip"
-            android:tint="@color/colorPrimary"
+
             app:srcCompat="@drawable/ic_add_black_24dp"
 
 
