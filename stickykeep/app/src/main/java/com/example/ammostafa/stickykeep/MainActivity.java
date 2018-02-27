@@ -3,7 +3,6 @@ package com.example.ammostafa.stickykeep;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +23,8 @@ import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.common.ChangeEventType;
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter;
 import com.firebase.ui.firestore.FirestoreRecyclerOptions;
+import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,6 +54,48 @@ public class MainActivity extends AppCompatActivity {
    boolean typing =false;
     RecyclerView stickyList;
 
+    private FloatingActionButton yellow;
+    private FloatingActionButton blue;
+    private FloatingActionButton green;
+    private FloatingActionButton red;
+    private FloatingActionButton orange;
+
+    private int ColorYellow;
+    private int ColorBlue;
+    private int ColorGreen;
+    private int ColorRed;
+    private int ColorOrange;
+
+
+    private View.OnClickListener clickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.yellow:
+                    Util.newSticky(userData,ColorYellow);
+
+                    break;
+                case R.id.blue:
+                    Util.newSticky(userData,ColorBlue);
+                    break;
+                case R.id.green:
+                    Util.newSticky(userData,ColorGreen);
+                    break;
+                case R.id.red:
+                    Util.newSticky(userData,ColorRed);
+                    break;
+                case R.id.orange:
+                    Util.newSticky(userData,ColorOrange);
+                    break;
+
+                case R.id.fab:
+                    Util.newSticky(userData,ColorOrange);
+                    break;
+
+            }
+        }
+    };
+
      public static Long lastTypingTime = Long.valueOf(0);
     CollectionReference userData;
 
@@ -74,16 +117,23 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_bar);
         setSupportActionBar(toolbar);
         stickyList = findViewById(R.id.sticky_list);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        FloatingActionMenu fab =  findViewById(R.id.fab);
 
-            Util.newSticky(userData);
+        yellow =  findViewById(R.id.yellow);
+        blue =  findViewById(R.id.blue);
+        green =  findViewById(R.id.green);
+        red =  findViewById(R.id.red);
+        orange =  findViewById(R.id.orange);
 
-            }
-        });
+        yellow.setOnClickListener(clickListener);
+        blue.setOnClickListener(clickListener);
+        green.setOnClickListener(clickListener);
+        red.setOnClickListener(clickListener);
+        orange.setOnClickListener(clickListener);
+orange.show(false);
 
+
+fab.setOnClickListener(clickListener);
         // Firestore
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
@@ -273,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
 
                        switch (type) {
                            case ADD:
-                               Util.newSticky(userData);
+                               Util.newSticky(userData,121212);
 
                                Toast.makeText(view.getContext(), "Item was Added  " + docId, Toast.LENGTH_SHORT).show();
                                break;
@@ -367,7 +417,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
-                finish();
+                this.finish();
             }
         }
     }

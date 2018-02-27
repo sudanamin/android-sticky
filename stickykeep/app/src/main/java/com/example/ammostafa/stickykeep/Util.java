@@ -19,6 +19,8 @@ import java.util.Map;
  */
 public final class Util {
     // Example Utility method
+
+  //  FloatingActionMenu menuGreen;
     public static void deleteSticky(Context context, DocumentReference docReferece) {
         DocumentReference docRef = docReferece;
 
@@ -40,7 +42,7 @@ public final class Util {
                 });
     }
 
-    public static void newSticky( CollectionReference collectionReference) {
+    public static void newSticky( CollectionReference collectionReference,int color) {
 
         Map<String, Object> newSticky = new HashMap<>();
 
@@ -67,4 +69,6 @@ public final class Util {
 
 
     }
+
+
 }
