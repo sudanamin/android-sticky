@@ -16,6 +16,8 @@ import android.widget.ImageView;
 
     public class FireHolder extends RecyclerView.ViewHolder  {
 
+        String color;
+
         EditText dataView;
 
         ImageView stickyClose,stickyAdd;
@@ -100,6 +102,16 @@ import android.widget.ImageView;
 
     public void setOnTextChangeListener(FireHolder.TextChangeListener textChangeListener){
         mTextChangeListener = textChangeListener;
+    }
+
+
+    public void setColor(String color){
+
+        this.color = color;
+    }
+
+    public String getColor(){
+        return this.color;
     }
     }
 

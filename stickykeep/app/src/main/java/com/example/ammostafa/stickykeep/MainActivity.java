@@ -1,8 +1,11 @@
 package com.example.ammostafa.stickykeep;
 
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -43,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseFirestore mFirestore;
     //@BindView(R.id.progress_bar)
     //ProgressBar progressBar;
-
+    Context context ;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     public static final int RC_SIGN_IN = 1;
@@ -53,18 +57,18 @@ public class MainActivity extends AppCompatActivity {
 
    boolean typing =false;
     RecyclerView stickyList;
-
+    private SwipeRefreshLayout  mySwipeRefreshLayout;
     private FloatingActionButton yellow;
     private FloatingActionButton blue;
     private FloatingActionButton green;
     private FloatingActionButton red;
     private FloatingActionButton orange;
 
-    private int ColorYellow;
-    private int ColorBlue;
-    private int ColorGreen;
-    private int ColorRed;
-    private int ColorOrange;
+    private String  ColorYellow ="#FFFF8A";
+    private String ColorBlue = "#6596F7";
+    private String ColorGreen = "#92FF8A";
+    private String ColorRed =  "#DA55C6";
+    private String  ColorOrange = "#ff8534";
 
 
     private View.OnClickListener clickListener = new View.OnClickListener() {
@@ -73,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
             switch (v.getId()) {
                 case R.id.yellow:
                     Util.newSticky(userData,ColorYellow);
-
                     break;
                 case R.id.blue:
                     Util.newSticky(userData,ColorBlue);
@@ -88,9 +91,7 @@ public class MainActivity extends AppCompatActivity {
                     Util.newSticky(userData,ColorOrange);
                     break;
 
-                case R.id.fab:
-                    Util.newSticky(userData,ColorOrange);
-                    break;
+
 
             }
         }
@@ -101,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
 
     //@BindView(R.id.progress_bar)
     ProgressBar progressBar;
+    TextView connectionStatus;
+    FloatingActionMenu fab;
 
     private FirestoreRecyclerAdapter adapter;
     LinearLayoutManager linearLayoutManager;
@@ -115,10 +118,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         progressBar = findViewById(R.id.progress_bar);
+        connectionStatus = findViewById(R.id.connectionStatus);
         setSupportActionBar(toolbar);
         stickyList = findViewById(R.id.sticky_list);
-        FloatingActionMenu fab =  findViewById(R.id.fab);
+         fab =  findViewById(R.id.fab);
+        if (user != null) {
+            // User is signed in
+            userData = mFirestore.collection("users").document(user.getUid()).collection("userData");
 
+            onSignedInInitialize(user.getDisplayName());
+        }
         yellow =  findViewById(R.id.yellow);
         blue =  findViewById(R.id.blue);
         green =  findViewById(R.id.green);
@@ -130,31 +139,95 @@ public class MainActivity extends AppCompatActivity {
         green.setOnClickListener(clickListener);
         red.setOnClickListener(clickListener);
         orange.setOnClickListener(clickListener);
-orange.show(false);
 
 
-fab.setOnClickListener(clickListener);
+        fab.setClosedOnTouchOutside(true);
+
+        if ( Util.internetConnectivity(this)) {
+            connectionStatus.setVisibility(View.GONE);
+            InitAuthStateListener();
+        }
+        else {
+            connectionStatus.setText("You are working offline now... Please check your internet service.");
+            progressBar.setVisibility(View.GONE);
+            fab.setVisibility(View.GONE);
+
+        }
+
         // Firestore
+
+
+        context =this;
+        mySwipeRefreshLayout = findViewById(R.id.swiperefresh);
+        mySwipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        Log.i("jhjjj", "onRefresh called from SwipeRefreshLayout");
+                        // Remember to CLEAR OUT old items before appending in the new ones
+                   //     adapter.clear();
+                        // ...the data has come back, add new items to your adapter...
+                      //  adapter.addAll(...);
+                        if ( Util.internetConnectivity(context)) {
+                            connectionStatus.setVisibility(View.GONE);
+                            if (mAuthStateListener ==null) {
+                                InitAuthStateListener();
+
+                                mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+                            }
+
+
+                           if(adapter !=null)
+                            adapter.notifyDataSetChanged();
+
+
+                           if(fab.getVisibility() == View.GONE ) fab.setVisibility(View.VISIBLE);
+
+
+                          // if(mFirebaseAuth != null)
+                                mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
+                        }
+
+
+
+
+                        else {
+                            connectionStatus.setVisibility(View.VISIBLE);
+                           // adapter.notifyDataSetChanged();
+                            connectionStatus.setText("You are working offline now... Please check your internet service.");
+                            mySwipeRefreshLayout.setRefreshing(false);
+
+
+
+                        }
+                       // adapter.notifyDataSetChanged();
+                      //  adapter.startListening();
+
+
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                      //  myUpdateOperation();
+                    }
+                }
+        );
+
+
+
+
+
+    }
+
+    private void InitAuthStateListener() {
+
+
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
 
-
-        /*
-        mMessageEditText.setFilters(new InputFilter[]{new InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT)});
-
-        // Send button sends a message and clears the EditText
-        mSendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FriendlyMessage friendlyMessage = new FriendlyMessage(mMessageEditText.getText().toString(), mUsername, null);
-                mMessagesDatabaseReference.push().setValue(friendlyMessage);
-
-                // Clear input box
-                mMessageEditText.setText("");
-            }
-        });*/
-
-
+       /* FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(false)
+                .build();
+        mFirestore.setFirestoreSettings(settings);*/
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -180,8 +253,6 @@ fab.setOnClickListener(clickListener);
                 }
             }
         };
-
-
     }
 
     @Override
@@ -206,7 +277,9 @@ fab.setOnClickListener(clickListener);
     protected void onResume(){
 
         super.onResume();
+        if(mFirebaseAuth != null)
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
     }
 
     @Override
@@ -225,11 +298,13 @@ fab.setOnClickListener(clickListener);
         super.onStart();
 
 
+
     }
 
     @Override
     protected void onStop(){
         super.onStop();
+        if (adapter !=null)
         adapter.stopListening();
 
     }
@@ -240,7 +315,7 @@ fab.setOnClickListener(clickListener);
 
     private void onSignedOutCleanup() {
         mUsername = ANONYMOUS;
-      //  mMessageAdapter.clear();
+   //    adapter.stopListening();
      //   detachDatabaseReadListener();
     }
 
@@ -287,32 +362,37 @@ fab.setOnClickListener(clickListener);
            @Override
            public void onBindViewHolder(FireHolder holder, int position, StickyClass model) {
                progressBar.setVisibility(View.GONE);
+               mySwipeRefreshLayout.setRefreshing(false);
+             //  mySwipeRefreshLayout.setRefreshing(false);
                String ss = model.getsdata();
-           //   if(holder.dataView.getText().toString().length() == 0) {
                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                        holder.dataView.setText(Html.fromHtml(ss, Html.FROM_HTML_MODE_LEGACY));
                    } else {
                        holder.dataView.setText(Html.fromHtml(ss));
                    }
-           //    }
-     //    holder.dataView.setSelection(null);
+
+
+
+               holder.setColor(model.getScolor());
+                   System.out.println("color from holder is : "+holder.getColor());
+              String colr = holder.getColor();
+              if (colr.contains("rgb")) {
+                  String color = Util.RGBtoString(colr);
+                  System.out.println("color of RGB : "+colr+ "  has been converted to normal : "+color);
+                  colr = color;
+              }
+
+              holder.dataView.setBackgroundColor(Color.parseColor(colr));
 
                String docId = getSnapshots().getSnapshot(position).getId();
+              }
 
-               Log.d("GETREFTEST", docId);
-               System.out.println("modelllll. postion id "+position);
-
-
-               Log.d("GETREFTEST", docId);
-               System.out.println("modelllll.getididididididididid"+docId);
-
-          }
            @Override
            public FireHolder onCreateViewHolder(ViewGroup group, int i) {
                View view = LayoutInflater.from(group.getContext())
                        .inflate(R.layout.sticky_ticket, group, false);
 
-               FireHolder viewHolder = new FireHolder(view);
+               final FireHolder viewHolder = new FireHolder(view);
 
                viewHolder.setOnClickListener(new FireHolder.ClickListener() {
 
@@ -323,7 +403,11 @@ fab.setOnClickListener(clickListener);
 
                        switch (type) {
                            case ADD:
-                               Util.newSticky(userData,121212);
+                               String color = viewHolder.getColor();
+                              if (color == null)
+                                  color =ColorBlue;
+
+                               Util.newSticky(userData,color);
 
                                Toast.makeText(view.getContext(), "Item was Added  " + docId, Toast.LENGTH_SHORT).show();
                                break;
@@ -403,6 +487,7 @@ fab.setOnClickListener(clickListener);
        linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
        stickyList.setLayoutManager(linearLayoutManager);
        stickyList.setAdapter(adapter);
+      if ( adapter.getItemCount() == 0) progressBar.setVisibility(View.GONE);
    }
 
 
@@ -417,9 +502,12 @@ fab.setOnClickListener(clickListener);
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
-                this.finish();
+                finish();
             }
         }
     }
+
+
+
 
 }

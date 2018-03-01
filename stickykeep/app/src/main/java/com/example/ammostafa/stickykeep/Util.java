@@ -1,6 +1,8 @@
 package com.example.ammostafa.stickykeep;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -20,9 +22,13 @@ import java.util.Map;
 public final class Util {
     // Example Utility method
 
+
+    public static  int statusCode ;
   //  FloatingActionMenu menuGreen;
     public static void deleteSticky(Context context, DocumentReference docReferece) {
         DocumentReference docRef = docReferece;
+
+
 
         docRef
                 .delete()
@@ -42,14 +48,15 @@ public final class Util {
                 });
     }
 
-    public static void newSticky( CollectionReference collectionReference,int color) {
+    public static void newSticky( CollectionReference collectionReference,String color) {
 
         Map<String, Object> newSticky = new HashMap<>();
 
         newSticky.put("sdata"," ");
         newSticky.put("top",10);
         newSticky.put("left",15);
-        newSticky.put("Scolor","ffffff");
+        System.out.println("value of color is : "+ color);
+        newSticky.put("Scolor",color);
 
 
        // userData = mFirestore.collection("users").document(user.getUid()).collection("userData");
@@ -69,6 +76,35 @@ public final class Util {
 
 
     }
+public static Boolean  internetConnectivity(Context context ) {
+    ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    NetworkInfo info = cm.getActiveNetworkInfo();
+    return  (info != null && info.isConnected());
+
+}
 
 
+
+    public static String   RGBtoString(String rgb)
+    {
+
+        String[] parts = rgb.split(",");
+        System.out.println("parts one is : "+ parts[1]);
+        switch ( parts[0]){
+            case "rgb(218": return "#DA55C6";
+            //break;
+
+            case "rgb(146":  return "#92FF8A";
+            // break;
+
+            case "rgb(101":  return "#6596F7";
+            //  break;
+
+            case "rgb(255": if (parts[1].contains("255")) return  "#ffff8a"; else return "#ff8534";
+
+
+        }
+        return "#ffffff";
+
+    }
 }
