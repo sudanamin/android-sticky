@@ -38,11 +38,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.Query;
 
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  implements ConnectivityReceiver.ConnectivityReceiverListener {
 
     private FirebaseFirestore mFirestore;
     //@BindView(R.id.progress_bar)
@@ -105,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
     TextView connectionStatus;
     FloatingActionMenu fab;
 
-    private FirestoreRecyclerAdapter adapter;
+    private FirestoreRecyclerAdapter<StickyClass, FireHolder> adapter;
     LinearLayoutManager linearLayoutManager;
     private void init(){
       //  linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
@@ -143,20 +144,11 @@ public class MainActivity extends AppCompatActivity {
 
         fab.setClosedOnTouchOutside(true);
 
-        if ( Util.internetConnectivity(this)) {
-            connectionStatus.setVisibility(View.GONE);
-            InitAuthStateListener();
-        }
-        else {
-            connectionStatus.setText("You are working offline now... Please check your internet service.");
-            progressBar.setVisibility(View.GONE);
-            fab.setVisibility(View.GONE);
 
-        }
 
         // Firestore
 
-
+      //  InitAuthStateListener();
         context =this;
         mySwipeRefreshLayout = findViewById(R.id.swiperefresh);
         mySwipeRefreshLayout.setOnRefreshListener(
@@ -164,56 +156,13 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onRefresh() {
                         Log.i("jhjjj", "onRefresh called from SwipeRefreshLayout");
-                        // Remember to CLEAR OUT old items before appending in the new ones
-                   //     adapter.clear();
-                        // ...the data has come back, add new items to your adapter...
-                      //  adapter.addAll(...);
-                        if ( Util.internetConnectivity(context)) {
-                            connectionStatus.setVisibility(View.GONE);
-                            if (mAuthStateListener ==null) {
-                                InitAuthStateListener();
-
-                                mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-                            }
-
-
-                           if(adapter !=null)
-                            adapter.notifyDataSetChanged();
-
-
-                           if(fab.getVisibility() == View.GONE ) fab.setVisibility(View.VISIBLE);
-
-
-                          // if(mFirebaseAuth != null)
-                                mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-
-                        }
-
-
-
-
-                        else {
-                            connectionStatus.setVisibility(View.VISIBLE);
-                           // adapter.notifyDataSetChanged();
-                            connectionStatus.setText("You are working offline now... Please check your internet service.");
-                            mySwipeRefreshLayout.setRefreshing(false);
-
-
-
-                        }
-                       // adapter.notifyDataSetChanged();
-                      //  adapter.startListening();
-
-
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
-                      //  myUpdateOperation();
+                        checkConnection();
                     }
                 }
         );
 
 
-
+        checkConnection();
 
 
     }
@@ -223,11 +172,12 @@ public class MainActivity extends AppCompatActivity {
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
-
-       /* FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+     //   mFirestore.setLoggingEnabled(true);
+        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
                 .setPersistenceEnabled(false)
                 .build();
-        mFirestore.setFirestoreSettings(settings);*/
+        mFirestore.setFirestoreSettings(settings);
+
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -277,6 +227,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume(){
 
         super.onResume();
+        StickyKeep.getInstance().setConnectivityListener(this);
         if(mFirebaseAuth != null)
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
 
@@ -323,10 +274,12 @@ public class MainActivity extends AppCompatActivity {
 
 
        DocumentReference  usersRef = mFirestore.collection("users").document(user.getUid());
+    //   mFirestore.keepSynced(true);
      //  System.out.println("user is aaaaaaaaaaaaaaaaaaaaaaaaaaa "+user.getUid());
        //CollectionReference query;
        Query query = usersRef.collection("userData");
 
+     //  query.k
 
 
        FirestoreRecyclerOptions<StickyClass> response = new FirestoreRecyclerOptions.Builder<StickyClass>()
@@ -502,12 +455,51 @@ public class MainActivity extends AppCompatActivity {
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
-                finish();
+                this.finish();
             }
         }
     }
 
 
+    @Override
+    public void onNetworkConnectionChanged(boolean isConnected) {
+        ifConnectThenCleanOrShow(isConnected);
+    }
+
+    private void ifConnectThenCleanOrShow(boolean isConnected) {
+        if (isConnected) {
+
+            connectionStatus.setVisibility(View.GONE);
+            stickyList.setVisibility(View.VISIBLE);
+            if (mAuthStateListener == null) {
+                InitAuthStateListener();
+
+                mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+            }
 
 
+            if (fab.getVisibility() == View.GONE) fab.setVisibility(View.VISIBLE);
+
+            if (adapter != null)
+                adapter.notifyDataSetChanged();
+
+        }
+
+        else {
+            connectionStatus.setVisibility(View.VISIBLE);
+            if(fab.getVisibility() == View.VISIBLE ) fab.setVisibility(View.GONE);
+            connectionStatus.setText("You are working offline now... Please check your internet service.");
+            mySwipeRefreshLayout.setRefreshing(false);
+            progressBar.setVisibility(View.GONE);
+            stickyList.setVisibility(View.GONE);
+
+
+
+        }
+    }
+
+    private void checkConnection() {
+        boolean isConnected = ConnectivityReceiver.isConnected();
+        ifConnectThenCleanOrShow(isConnected);
+    }
 }
