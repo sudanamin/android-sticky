@@ -316,6 +316,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
            public void onBindViewHolder(FireHolder holder, int position, StickyClass model) {
                progressBar.setVisibility(View.GONE);
                mySwipeRefreshLayout.setRefreshing(false);
+              
              //  mySwipeRefreshLayout.setRefreshing(false);
                String ss = model.getsdata();
                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -470,6 +471,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
         if (isConnected) {
 
             connectionStatus.setVisibility(View.GONE);
+            mySwipeRefreshLayout.setRefreshing(true);
             stickyList.setVisibility(View.VISIBLE);
             if (mAuthStateListener == null) {
                 InitAuthStateListener();
