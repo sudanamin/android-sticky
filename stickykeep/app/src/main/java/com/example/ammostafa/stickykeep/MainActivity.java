@@ -488,7 +488,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
         else {
             connectionStatus.setVisibility(View.VISIBLE);
             if(fab.getVisibility() == View.VISIBLE ) fab.setVisibility(View.GONE);
-            connectionStatus.setText("You are working offline now... Please check your internet service.");
+            connectionStatus.setText("You are offline... Kindly check your internet service.");
             mySwipeRefreshLayout.setRefreshing(false);
             progressBar.setVisibility(View.GONE);
             stickyList.setVisibility(View.GONE);
