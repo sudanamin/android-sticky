@@ -19,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
     private String mUsername;
     FirebaseUser user;
 
-   boolean typing =false;
+
     RecyclerView stickyList;
     private SwipeRefreshLayout  mySwipeRefreshLayout;
     private FloatingActionButton yellow;
@@ -101,8 +100,6 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
      public static Long lastTypingTime = Long.valueOf(0);
     CollectionReference userData;
 
-    //@BindView(R.id.progress_bar)
-    ProgressBar progressBar;
     TextView connectionStatus;
     FloatingActionMenu fab;
 
@@ -118,7 +115,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        progressBar = findViewById(R.id.progress_bar);
+
         connectionStatus = findViewById(R.id.connectionStatus);
         setSupportActionBar(toolbar);
         stickyList = findViewById(R.id.sticky_list);
@@ -160,9 +157,13 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
                     }
                 }
         );
-
-
         checkConnection();
+        InitAuthStateListener();
+
+
+
+
+
 
 
     }
@@ -190,16 +191,20 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
                 } else {
                     // User is signed out
                     onSignedOutCleanup();
-                    startActivityForResult(
-                            AuthUI.getInstance()
-                                    .createSignInIntentBuilder()
-                                    .setIsSmartLockEnabled(false)
-                                    .setAvailableProviders(Arrays.asList(
-                                            new AuthUI.IdpConfig.EmailBuilder().build(),
-                                            new AuthUI.IdpConfig.GoogleBuilder().build(),
-                                            new AuthUI.IdpConfig.FacebookBuilder().build()))
-                                    .build(),
-                            RC_SIGN_IN);
+
+                    if(ConnectivityReceiver.isConnected() ) {
+
+                        startActivityForResult(
+                                AuthUI.getInstance()
+                                        .createSignInIntentBuilder()
+                                        .setIsSmartLockEnabled(false)
+                                        .setAvailableProviders(Arrays.asList(
+                                                new AuthUI.IdpConfig.EmailBuilder().build(),
+                                                new AuthUI.IdpConfig.GoogleBuilder().build(),
+                                                new AuthUI.IdpConfig.FacebookBuilder().build()))
+                                        .build(),
+                                RC_SIGN_IN);
+                    }
                 }
             }
         };
@@ -215,9 +220,13 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.sign_out_menu:
-                AuthUI.getInstance().signOut(this);
+            case R.id.sign_out_menu: {
+                mFirebaseAuth.signOut();
+
+               // adapter.stopListening();
+
                 return true;
+            }
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -228,8 +237,14 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
         super.onResume();
         StickyKeep.getInstance().setConnectivityListener(this);
-        if(mFirebaseAuth != null)
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
+        if (mFirebaseAuth != null) {
+            mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        }
+
+        if(adapter != null ) adapter.startListening();
+
+
 
     }
 
@@ -237,7 +252,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
     protected void onPause() {
         super.onPause();
 
-        if (mAuthStateListener != null) {
+        if (mFirebaseAuth != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
     //    mMessageAdapter.clear();
@@ -255,8 +270,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
     @Override
     protected void onStop(){
         super.onStop();
-        if (adapter !=null)
-        adapter.stopListening();
+
 
     }
     private void onSignedInInitialize(String username) {
@@ -266,6 +280,8 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
     private void onSignedOutCleanup() {
         mUsername = ANONYMOUS;
+        if(adapter !=null)
+        adapter.stopListening();
    //    adapter.stopListening();
      //   detachDatabaseReadListener();
     }
@@ -314,9 +330,9 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
            @Override
            public void onBindViewHolder(FireHolder holder, int position, StickyClass model) {
-               progressBar.setVisibility(View.GONE);
+
                mySwipeRefreshLayout.setRefreshing(false);
-              
+
              //  mySwipeRefreshLayout.setRefreshing(false);
                String ss = model.getsdata();
                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -398,9 +414,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
                                                         String stickyDataHtml =  Html.toHtml(new SpannableString(stickyData));
 
-
-
-                                                          DocumentReference docRef = mFirestore.collection("users").document(user.getUid()).collection("userData").document(docId);
+                                                        DocumentReference docRef = mFirestore.collection("users").document(user.getUid()).collection("userData").document(docId);
 
                                                       /*    lastTypingTime = Calendar.getInstance().getTimeInMillis();
 
@@ -441,7 +455,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
        linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
        stickyList.setLayoutManager(linearLayoutManager);
        stickyList.setAdapter(adapter);
-      if ( adapter.getItemCount() == 0) progressBar.setVisibility(View.GONE);
+    /*  if ( adapter.getItemCount() == 0) progressBar.setVisibility(View.GONE);*/
    }
 
 
@@ -469,21 +483,24 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
     private void ifConnectThenCleanOrShow(boolean isConnected) {
         if (isConnected) {
-
             connectionStatus.setVisibility(View.GONE);
-            mySwipeRefreshLayout.setRefreshing(true);
-            stickyList.setVisibility(View.VISIBLE);
-            if (mAuthStateListener == null) {
-                InitAuthStateListener();
 
-                mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
+                mySwipeRefreshLayout.setRefreshing(false);
+                stickyList.setVisibility(View.VISIBLE);
+
+            if(user != null) {
+                if (fab.getVisibility() == View.GONE) fab.setVisibility(View.VISIBLE);
+                mySwipeRefreshLayout.setRefreshing(true);
+
+
+                if (adapter != null)
+                    adapter.notifyDataSetChanged();
             }
 
 
-            if (fab.getVisibility() == View.GONE) fab.setVisibility(View.VISIBLE);
 
-            if (adapter != null)
-                adapter.notifyDataSetChanged();
+
 
         }
 
@@ -492,7 +509,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
             if(fab.getVisibility() == View.VISIBLE ) fab.setVisibility(View.GONE);
             connectionStatus.setText("You are offline... Kindly check your internet service.");
             mySwipeRefreshLayout.setRefreshing(false);
-            progressBar.setVisibility(View.GONE);
+
             stickyList.setVisibility(View.GONE);
 
 
