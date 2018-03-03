@@ -105,6 +105,8 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
     private FirestoreRecyclerAdapter<StickyClass, FireHolder> adapter;
     LinearLayoutManager linearLayoutManager;
+    private boolean startLoginActivityWhenConnect;
+
     private void init(){
       //  linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
       //  stickyList.setLayoutManager(linearLayoutManager);
@@ -170,7 +172,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
     private void InitAuthStateListener() {
 
-
+        System.out.println("hi offline login out");
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirestore = FirebaseFirestore.getInstance();
      //   mFirestore.setLoggingEnabled(true);
@@ -182,17 +184,25 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
         mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
                  user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
                     userData = mFirestore.collection("users").document(user.getUid()).collection("userData");
 
                     onSignedInInitialize(user.getDisplayName());
+
+                    if (fab.getVisibility() == View.GONE) fab.setVisibility(View.VISIBLE);
+
+
+                    if (adapter != null) adapter.notifyDataSetChanged();
+                    
                 } else {
                     // User is signed out
                     onSignedOutCleanup();
 
                     if(ConnectivityReceiver.isConnected() ) {
+                        System.out.println("from when lisenter");
 
                         startActivityForResult(
                                 AuthUI.getInstance()
@@ -205,6 +215,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
                                         .build(),
                                 RC_SIGN_IN);
                     }
+                    else startLoginActivityWhenConnect = true;
                 }
             }
         };
@@ -251,6 +262,8 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
     @Override
     protected void onPause() {
         super.onPause();
+
+        if(adapter != null ) adapter.stopListening();
 
         if (mFirebaseAuth != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
@@ -470,7 +483,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
             } else if (resultCode == RESULT_CANCELED) {
                 // Sign in was canceled by the user, finish the activity
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
-                this.finish();
+                finish();
             }
         }
     }
@@ -496,6 +509,23 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
                 if (adapter != null)
                     adapter.notifyDataSetChanged();
+            }
+
+            if(startLoginActivityWhenConnect == true)
+            {
+                mySwipeRefreshLayout.setRefreshing(true);
+                startLoginActivityWhenConnect = false;
+                System.out.println("from when connect");
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setIsSmartLockEnabled(false)
+                                .setAvailableProviders(Arrays.asList(
+                                        new AuthUI.IdpConfig.EmailBuilder().build(),
+                                        new AuthUI.IdpConfig.GoogleBuilder().build(),
+                                        new AuthUI.IdpConfig.FacebookBuilder().build()))
+                                .build(),
+                        RC_SIGN_IN);
             }
 
 
