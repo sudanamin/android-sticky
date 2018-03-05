@@ -65,6 +65,8 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
     private FloatingActionButton red;
     private FloatingActionButton orange;
 
+
+
     private String  ColorYellow ="#FFFF8A";
     private String ColorBlue = "#6596F7";
     private String ColorGreen = "#92FF8A";
@@ -307,7 +309,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
     //   mFirestore.keepSynced(true);
      //  System.out.println("user is aaaaaaaaaaaaaaaaaaaaaaaaaaa "+user.getUid());
        //CollectionReference query;
-       Query query = usersRef.collection("userData");
+       Query query = usersRef.collection("userData").orderBy("timestamp", Query.Direction.DESCENDING);
       // query.Order
 
      //  query.k
@@ -347,6 +349,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
            public void onBindViewHolder(FireHolder holder, int position, StickyClass model) {
 
                mySwipeRefreshLayout.setRefreshing(false);
+               holder.preventFirsttimeDataChange = false;
           System.out.println("time stamp is :"+model.gettimestamp());
              //  mySwipeRefreshLayout.setRefreshing(false);
                String ss = model.getsdata();
@@ -427,9 +430,14 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
                                                          String docId = getSnapshots().getSnapshot(position).getId();
                                                          String stickyData = editable.toString();
 
-                                                        String stickyDataHtml =  Html.toHtml(new SpannableString(stickyData));
+                                                         if(viewHolder.preventFirsttimeDataChange) {
 
-                                                        DocumentReference docRef = mFirestore.collection("users").document(user.getUid()).collection("userData").document(docId);
+                                                             System.out.println("i am in");
+
+
+                                                             String stickyDataHtml = Html.toHtml(new SpannableString(stickyData));
+
+                                                             DocumentReference docRef = mFirestore.collection("users").document(user.getUid()).collection("userData").document(docId);
 
                                                       /*    lastTypingTime = Calendar.getInstance().getTimeInMillis();
 
@@ -438,38 +446,39 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
                                                                updateAsync.execute();*/
 
 
+                                                             docRef.update("sdata", stickyDataHtml)
+                                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                         @Override
+                                                                         public void onSuccess(Void aVoid) {
+                                                                             Log.d("update sdata", "DocumentSnapshot successfully updated!");
+                                                                         }
+                                                                     })
+                                                                     .addOnFailureListener(new OnFailureListener() {
+                                                                         @Override
+                                                                         public void onFailure(@NonNull Exception e) {
+                                                                             Log.w("update sdata", "Error updating document", e);
+                                                                         }
+                                                                     });
 
+                                                             docRef.update("timestamp", FieldValue.serverTimestamp())
+                                                                     .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                         @Override
+                                                                         public void onSuccess(Void aVoid) {
+                                                                             Log.d("update time ", "DocumentSnapshot successfully updated!");
+                                                                         }
+                                                                     })
+                                                                     .addOnFailureListener(new OnFailureListener() {
+                                                                         @Override
+                                                                         public void onFailure(@NonNull Exception e) {
+                                                                             Log.w("update time", "Error updating document", e);
+                                                                         }
+                                                                     });
+                                                         }
 
-
-                                                          docRef.update("sdata", stickyDataHtml)
-                                                                  .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                      @Override
-                                                                      public void onSuccess(Void aVoid) {
-                                                                          Log.d("update sdata", "DocumentSnapshot successfully updated!");
-                                                                      }
-                                                                  })
-                                                                  .addOnFailureListener(new OnFailureListener() {
-                                                                      @Override
-                                                                      public void onFailure(@NonNull Exception e) {
-                                                                          Log.w("update sdata", "Error updating document", e);
-                                                                      }
-                                                                  });
-
-                                                          docRef.update("timestamp", FieldValue.serverTimestamp())
-                                                                  .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                                      @Override
-                                                                      public void onSuccess(Void aVoid) {
-                                                                          Log.d("update time ", "DocumentSnapshot successfully updated!");
-                                                                      }
-                                                                  })
-                                                                  .addOnFailureListener(new OnFailureListener() {
-                                                                      @Override
-                                                                      public void onFailure(@NonNull Exception e) {
-                                                                          Log.w("update time", "Error updating document", e);
-                                                                      }
-                                                                  });
+                                                          viewHolder.preventFirsttimeDataChange =true;
 
                                                       }
+
                                                   }
                );
                return  viewHolder;

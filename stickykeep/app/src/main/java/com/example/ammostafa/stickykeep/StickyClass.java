@@ -1,6 +1,8 @@
 package com.example.ammostafa.stickykeep;
 
 
+import java.util.Date;
+
 /**
  * Created by Aminov on 2/9/2018.
  */
@@ -13,7 +15,7 @@ package com.example.ammostafa.stickykeep;
         private int  top;
         private int left;
     private String sdata ;
-    private Object timestamp;
+    private Date timestamp ;
 
         public StickyClass() {
         }
@@ -38,7 +40,7 @@ package com.example.ammostafa.stickykeep;
             return Scolor;
         }
 
-    public Object gettimestamp() {
+    public Date gettimestamp() {
         return timestamp;
     }
 /*

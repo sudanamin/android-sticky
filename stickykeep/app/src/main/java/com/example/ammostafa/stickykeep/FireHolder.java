@@ -20,6 +20,8 @@ import android.widget.ImageView;
 
         EditText dataView;
 
+    boolean preventFirsttimeDataChange =false;
+
         ImageView stickyClose,stickyAdd;
         //   @BindView(R.id.title)
         //    TextView textTitle;
