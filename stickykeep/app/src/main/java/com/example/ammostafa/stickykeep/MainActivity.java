@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
         mFirestore = FirebaseFirestore.getInstance();
      //   mFirestore.setLoggingEnabled(true);
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setPersistenceEnabled(false)
+                .setPersistenceEnabled(true)
                 .build();
         mFirestore.setFirestoreSettings(settings);
 
@@ -475,6 +475,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
                                                                      });
                                                          }
 
+                                                         if(ConnectivityReceiver.isConnected())
                                                           viewHolder.preventFirsttimeDataChange =true;
 
                                                       }
@@ -562,10 +563,11 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
         else {
             connectionStatus.setVisibility(View.VISIBLE);
             if(fab.getVisibility() == View.VISIBLE ) fab.setVisibility(View.GONE);
-            connectionStatus.setText("You are offline... Kindly check your internet service.");
+           connectionStatus.setText("Check your internet service... Your change will not save.");}
+
             mySwipeRefreshLayout.setRefreshing(false);
 
-            stickyList.setVisibility(View.GONE);
+         //   stickyList.setVisibility(View.GONE);
 
 
 

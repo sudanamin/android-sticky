@@ -8,13 +8,15 @@
     tools:context="com.example.ammostafa.stickykeep.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
-        android:background="@color/colorWhite"
-        tools:context="com.guidoapps.firestorerecycleradaptersample.MainActivity">
+        android:orientation="vertical"
+        android:padding="12dip">
+
+    >
+
+
 
 
         <TextView
@@ -25,6 +27,14 @@
             />
 
 
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:background="@color/colorWhite"
+        tools:context="com.guidoapps.firestorerecycleradaptersample.MainActivity">
 
         <android.support.v4.widget.SwipeRefreshLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
@@ -43,5 +53,5 @@
 
     </RelativeLayout>
 
-
+   </LinearLayout>
 </android.support.constraint.ConstraintLayout>
