@@ -1,9 +1,9 @@
 package com.example.ammostafa.stickykeep;
 
+
 /**
  * Created by Aminov on 2/9/2018.
  */
-
 
 
 
@@ -13,6 +13,7 @@ package com.example.ammostafa.stickykeep;
         private int  top;
         private int left;
     private String sdata ;
+    private Object timestamp;
 
         public StickyClass() {
         }
@@ -36,6 +37,10 @@ package com.example.ammostafa.stickykeep;
         public String getScolor() {
             return Scolor;
         }
+
+    public Object gettimestamp() {
+        return timestamp;
+    }
 /*
         public void setCompany(String company) {
             this.company = company;

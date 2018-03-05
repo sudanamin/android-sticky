@@ -35,6 +35,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
@@ -196,7 +197,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
 
                     if (adapter != null) adapter.notifyDataSetChanged();
-                    
+
                 } else {
                     // User is signed out
                     onSignedOutCleanup();
@@ -307,6 +308,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
      //  System.out.println("user is aaaaaaaaaaaaaaaaaaaaaaaaaaa "+user.getUid());
        //CollectionReference query;
        Query query = usersRef.collection("userData");
+      // query.Order
 
      //  query.k
 
@@ -345,7 +347,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
            public void onBindViewHolder(FireHolder holder, int position, StickyClass model) {
 
                mySwipeRefreshLayout.setRefreshing(false);
-
+          System.out.println("time stamp is :"+model.gettimestamp());
              //  mySwipeRefreshLayout.setRefreshing(false);
                String ss = model.getsdata();
                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -450,6 +452,20 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
                                                                       @Override
                                                                       public void onFailure(@NonNull Exception e) {
                                                                           Log.w("update sdata", "Error updating document", e);
+                                                                      }
+                                                                  });
+
+                                                          docRef.update("timestamp", FieldValue.serverTimestamp())
+                                                                  .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                                      @Override
+                                                                      public void onSuccess(Void aVoid) {
+                                                                          Log.d("update time ", "DocumentSnapshot successfully updated!");
+                                                                      }
+                                                                  })
+                                                                  .addOnFailureListener(new OnFailureListener() {
+                                                                      @Override
+                                                                      public void onFailure(@NonNull Exception e) {
+                                                                          Log.w("update time", "Error updating document", e);
                                                                       }
                                                                   });
 

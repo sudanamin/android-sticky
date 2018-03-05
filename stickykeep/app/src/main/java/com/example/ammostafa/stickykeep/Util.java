@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,8 +56,9 @@ public final class Util {
         newSticky.put("sdata"," ");
         newSticky.put("top",10);
         newSticky.put("left",15);
-        System.out.println("value of color is : "+ color);
+
         newSticky.put("Scolor",color);
+        newSticky.put("timestamp", FieldValue.serverTimestamp());
 
 
        // userData = mFirestore.collection("users").document(user.getUid()).collection("userData");
