@@ -10,4 +10,6 @@
     <string name="sign_out">Sign Out</string>
     <string name="title">title</string>
     <string name="label">label</string>
+    <string name="sticky_desktop">Sticky Desktop</string>
+    <string name="sticky_web">Sticky Web</string>
 </resources>

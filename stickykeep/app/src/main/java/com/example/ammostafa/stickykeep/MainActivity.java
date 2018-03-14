@@ -233,6 +233,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent = new Intent();
         switch (item.getItemId()) {
             case R.id.sign_out_menu: {
                 mFirebaseAuth.signOut();
@@ -241,6 +242,18 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
                 return true;
             }
+
+            case R.id.action_pc:
+
+                Intent intent1 = intent.setClassName(getApplicationContext().getPackageName(), "com.example.ammostafa.stickykeep.PcActivity");
+                startActivity(intent);
+                return true;
+
+            case R.id.action_web:
+
+                intent.setClassName( getApplicationContext().getPackageName(),"com.example.ammostafa.stickykeep.WebActivity");
+                startActivity(intent);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -572,7 +585,7 @@ public class MainActivity extends AppCompatActivity  implements ConnectivityRece
 
 
         }
-    }
+
 
     private void checkConnection() {
         boolean isConnected = ConnectivityReceiver.isConnected();

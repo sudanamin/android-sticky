@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="12dip">
+        android:padding="1dip">
 
     >
 
@@ -23,6 +23,7 @@
             android:id="@+id/connectionStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="10dip"
 
             />
 
@@ -32,7 +33,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp"
+        android:padding="5dp"
         android:background="@color/colorWhite"
         tools:context="com.guidoapps.firestorerecycleradaptersample.MainActivity">
 
