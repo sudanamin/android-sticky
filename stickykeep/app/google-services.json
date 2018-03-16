@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:655107197844:android:a78f769b99ceb5d0",
+        "mobilesdk_app_id": "1:655107197844:android:539d799203cf7ccf",
         "android_client_info": {
-          "package_name": "com.example.ammostafa.stickykeep"
+          "package_name": "com.ammostafa.stickykeep"
         }
       },
       "oauth_client": [
         {
-          "client_id": "655107197844-6g6774950doji547bqsncpcj6sfibkv0.apps.googleusercontent.com",
+          "client_id": "655107197844-bkm2kfsq80nsivm1nc21g82ehgf0pana.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.ammostafa.stickykeep",
-            "certificate_hash": "21f2f61d589aae8b26ea95153ddf5711bddd938f"
+            "package_name": "com.ammostafa.stickykeep",
+            "certificate_hash": "f2b0f6399efb7d71603c350d6b6b875325faf858"
           }
         },
         {
