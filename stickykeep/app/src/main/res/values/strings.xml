@@ -3,9 +3,9 @@
     <string name="action_settings">Settings</string>
 
 
-    <string name="facebook_application_id" translatable="false">APP_ID</string>
-    <!-- Facebook Application ID, prefixed by 'fb'. Enables Chrome Custom tabs. -->
-    <string name="facebook_login_protocol_scheme" translatable="false">fbAPP_ID</string>
+    <string name="facebook_application_id" translatable="false">979043315532141</string>
+    <!-- Facebook Application ID, prefixed by 'fb'. Enables Chrome Cus2034233396797531tom tabs. -->
+    <string name="facebook_login_protocol_scheme" translatable="false">fb979043315532141</string>
 
     <string name="sign_out">Sign Out</string>
     <string name="title">title</string>
